@@ -1,0 +1,178 @@
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+
+local Window = Rayfield:CreateWindow({
+	Name = "Custom Jailbreak Hub | @A1pha#5995",
+	LoadingTitle = "Custom Jailbreak Hub",
+	LoadingSubtitle = "by drxck",
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = nil, -- Create a custom folder for your hub/game
+		FileName = "Custom JBHub"
+	},
+	KeySystem = true, -- Set this to true to use our key system
+	KeySettings = {
+		Title = "Custom Jailbreak Hub | @A1pha#5995",
+		Subtitle = "Key System",
+		Note = "Join the discord (discord.gg/DXJhVxhZ9w)",
+		FileName = "CJBKey",
+		SaveKey = true,
+		GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+		Key = "1"
+	}
+})
+
+Rayfield:Notify({
+    Title = "Custom Jailbreak Hub | @A1pha#5995",
+    Content = "GUI Loaded!",
+    Duration = 4.5,
+    Image = 871077212,
+})
+
+Rayfield:Notify({
+    Title = "Custom Jailbreak Hub",
+    Content = "discord.gg/DXJhVxhZ9w",
+    Duration = 8,
+    Image = 7204318505,
+    Actions = { -- Notification Buttons
+        Ignore = {
+            Name = "Join our Discord!",
+            Callback = function()
+                print("Join our Discord for updates!")
+            end
+		},
+	},
+})
+
+--Tab 1
+local Vehicle = Window:CreateTab("Vehicle", 11939146465) -- Title, Image
+local VehicleFrame = Vehicle:CreateSection("Choose Vehicle(s)")
+local ExportFrame = Vehicle:CreateSection("Export Selected")
+local ExportButton = Vehicle:CreateButton({
+	Name = "Export Selected Vehicle(s)",
+	Callback = function()
+		for i, Model in pairs(Vehicles) do
+            for i, Part in Model:GetDescendants() do
+                if Part.Name == "Thrust" and Part:FindFirstChild("Motor") then
+                    local Motor = Part.Motor
+                    local Wheel = Motor.Part0
+                    if Wheel.Parent.Name == "WheelBackLeft" then
+                        Part.Name = "ThrustRL"
+                    elseif Wheel.Parent.Name == "WheelBackRight" then
+                        Part.Name = "ThrustRR"
+                    elseif Wheel.Parent.Name == "WheelFrontLeft" then
+                        Part.Name = "ThrustFL"
+                    elseif Wheel.Parent.Name == "WheelFrontRight" then
+                        Part.Name = "ThrustFR"
+                    end
+                end
+            end
+            Model.Engine:FindFirstChild("BodyForce").Name = "BodyForce2"
+            for i,v in Model.Engine:GetDescendants() do
+                if v:IsA("Sound") and v.SoundId ~= "rbxassetid://690529934" then
+                    if v.SoundId == "rbxassetid://657590887" then
+                        v.Name = "onlow"
+                    elseif v.SoundId == "rbxassetid://657591233" then
+                        v.Name = "onmid"
+                    elseif v.SoundId == "rbxassetid://657591400" then
+                        v.Name = "onhigh"
+                    elseif v.SoundId == "rbxassetid://657590761" then
+                        v.Name = "idle"
+                        v.SoundId = ""
+                    elseif v.SoundId == "rbxassetid://9058869655" then
+                        v.Name = "offlow"
+                    end
+                end
+            end
+            Model.Seat.Player.Value = false
+            saveinstance(Model)
+        end 
+	end,
+})
+
+
+--Tab 2
+local Packet = Window:CreateTab("Packet Load", 11939147702) -- Title, Image
+local PacketFrame = Packet:CreateSection("Packet")
+
+--Tab 3
+local Settings = Window:CreateTab("Miscellaneous", 11939149111) -- Title, Image
+local SettingsFrame = Settings:CreateSection("Credits")
+local Credits1 = Settings:CreateLabel("Founder & Lead Scripter: drxck#0001")
+local Credits2 = Settings:CreateLabel("Script Help: Raivi GFX#7700")
+local Credits3 = Settings:CreateLabel("Support: RC#8027")
+local Credits4 = Settings:CreateLabel("Concept Ideas: DatJBkPlayer#9733")
+local Extra = Settings:CreateSection("Extra")
+local ExtraButton = Settings:CreateButton({
+	Name = "Destroy GUI",
+	Callback = function()
+		Rayfield:Destroy()
+        Rayfield:Notify({
+            Title = "Custom Jailbreak Hub | @A1pha#5995",
+            Content = "GUI has been destroyed!",
+            Duration = 3.5,
+            Image = 11939152232,
+        })
+	end,
+})
+
+--VehicleTab
+local Vehicles = {}
+for i,v in workspace.Vehicles:GetDescendants() do
+    if v:IsA("Model") and v:FindFirstChild("Engine") then
+        local VehicleToggle = Vehicle:CreateToggle({
+            Name = "Select"..v.Name,
+            CurrentValue = false,
+            Callback = function(state)
+                if state then
+                    Vehicles[v.Name] = v
+                else
+                    Vehicles[v.Name] = nil
+                end 
+            end
+        })
+    end
+end
+
+workspace.Vehicles.ChildAdded:Connect(function(child)
+	local VehicleToggle = Vehicle:CreateToggle({
+		Name = "Select"..child.Name,
+		CurrentValue = false,
+		Callback = function(state)
+			if state then
+                Vehicles[child.Name] = child
+            else
+                Vehicles[child.Name] = nil
+			end
+		end,
+	})
+end)
+
+--PacketTab
+local PacketBtn = Packet:CreateButton({
+	Name = "Get Local Vehicle Packet",
+	Callback = function()
+		if require(game:GetService("ReplicatedStorage").Game.Vehicle).GetLocalVehiclePacket() then
+			Rayfield:Notify({
+				Title = "Custom Jailbreak Hub",
+				Content = "Packet Loaded / Open Console to View Packet!",
+				Duration = 6,
+				Image = 7204318505,
+			})
+            for i, v in pairs(require(game:GetService("ReplicatedStorage").Game.Vehicle).GetLocalVehiclePacket()) do
+                print(i, v)
+            end
+            print("-------------- Gears --------------")
+            for i, v in pairs(require(game:GetService("ReplicatedStorage").Game.Vehicle).GetLocalVehiclePacket().Gears) do print(i, v) end
+        else
+			Rayfield:Notify({
+				Title = "Custom Jailbreak Hub",
+				Content = "Enter a Vehicle to get his Packet!",
+				Duration = 5,
+				Image = 7204318505,
+			})
+		end
+	end,
+})
+
+
+Rayfield:LoadConfiguration()
